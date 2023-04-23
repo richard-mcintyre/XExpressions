@@ -23,7 +23,7 @@ jobs:
         dotnet-version: 7.x
 
     - name: Display dotnet version
-      run: dotnet version
+      run: dotnet --version
 
 #    - name: Restore dependencies
 #      run: dotnet restore XExpressions.sln
