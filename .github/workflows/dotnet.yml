@@ -11,11 +11,12 @@ on:
 
 jobs:
   build:
-
+    name: Build
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
+
+    - name: Pull source
+      uses: actions/checkout@v3
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
@@ -30,6 +31,12 @@ jobs:
 
     - name: Build XExpressions
       run: dotnet build XExpressions.sln --no-restore
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
       
     - name: Test Variant
       run: dotnet test XExpressions.VariantType.Tests --no-build --verbosity normal
@@ -37,6 +44,12 @@ jobs:
     - name: Test Expressions
       run: dotnet test XExpressions.Tests --no-build --verbosity normal
      
+  package:
+    name: Package
+    runs-on: ubuntu-latest
+    needs: [build,test]
+    steps:
+
     - name: Bump build version
       id: bump
       uses: vers-one/dotnet-project-version-updater@v1.3
@@ -53,8 +66,10 @@ jobs:
 #        git push
           
       
-#    - name: Create package
-#      run: dotnet pack -o dist -c PackRelease XExpressions
+    - name: Create package
+      run: dotnet pack -o dist -c PackRelease XExpressions
+
+      
 #    - name: Add publish source
 #      run: dotnet nuget add source --username richard-mcintyre --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/richard-mcintyre/index.json"
 #    - name: Push package to nuget
