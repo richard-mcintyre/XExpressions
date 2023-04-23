@@ -1,0 +1,23 @@
+<Project>
+
+    <PropertyGroup>
+		<TargetFrameworks>net7.0</TargetFrameworks>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+    <PropertyGroup>
+    	<PackageProjectUrl>https://github.com/richard-mcintyre/XExpressions</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Authors>Richard McIntyre</Authors>
+		<Description>Math expression evaluation library</Description>
+        <PackageTags>expressions, expression, math</PackageTags>
+        <RepositoryType>git</RepositoryType>       
+    </PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+</Project>
