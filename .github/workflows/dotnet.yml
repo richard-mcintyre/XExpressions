@@ -43,7 +43,7 @@ jobs:
       with:
         file: |
           "**/XExpressions.csproj", "**/XExpressions.VariantType.csproj"
-        version: bump-build
+        version: bump-revision
 
 #    - run: |
 #        git config user.name "test"
