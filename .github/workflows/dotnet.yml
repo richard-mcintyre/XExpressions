@@ -35,7 +35,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    needs: [test]
+    needs: [build]
     steps:
       
     - name: Test Variant
@@ -69,7 +69,7 @@ jobs:
     - name: Create package
       run: dotnet pack -o dist -c PackRelease XExpressions
 
-      
+
 #    - name: Add publish source
 #      run: dotnet nuget add source --username richard-mcintyre --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/richard-mcintyre/index.json"
 #    - name: Push package to nuget
