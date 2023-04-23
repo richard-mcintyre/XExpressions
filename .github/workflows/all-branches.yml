@@ -32,6 +32,6 @@ jobs:
     - name: Test Expressions
       run: dotnet test XExpressions.Tests --no-build --verbosity normal
            
-    - name: Create package
-      run: dotnet pack -o dist -c PackRelease XExpressions
+
+
 
