@@ -1,0 +1,26 @@
+<div class="container">
+
+    <label for="expression">Expression</label>
+    <div class="input-group">
+        <input type="text" 
+               class="form-control" 
+               [ngClass]="{'is-invalid': errorDetails}" 
+               autocomplete="off"
+               autofocus
+               #expression id="expression" placeholder="100 + 200">
+
+        <div class="invalid-feedback">
+            {{errorDetails}}
+        </div>           
+
+    </div>
+
+    <div class="result">
+        {{evaluationResult?.value}}
+    </div>
+
+    <div class="log-container">
+        <img [src]="svgUrl" alt="{{evaluationResult?.value}}">
+    </div>
+
+</div>
