@@ -8,6 +8,12 @@ using XExpressions.VariantType;
 
 namespace XExpressions
 {
+    /// <summary>
+    /// Rerpesents a single token in an expression
+    /// </summary>
+    /// <param name="Kind">Type of token</param>
+    /// <param name="Position">Position of the token in the expression</param>
+    /// <param name="Value">Value of the token in the expression</param>
     public record Token(TokenKind Kind, int Position, string Value)
     {
         public static Token FromVariant(Variant value)

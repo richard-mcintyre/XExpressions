@@ -41,6 +41,9 @@ jobs:
     - name: Create package variant
       run: dotnet pack -o dist -c PackRelease XExpressions.VariantType
 
+    - name: Create package SVG
+      run: dotnet pack -o dist -c PackRelease XExpressions.SVG
+
     - name: Upload package artifacts
       uses: actions/upload-artifact@v3
       with:

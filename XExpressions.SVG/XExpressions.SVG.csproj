@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<PackageId>XExpressions.SVG</PackageId>
+		<Version>1.0.6.0</Version>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Msagl.Drawing" Version="1.1.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\XExpressions\XExpressions.csproj" />
+	</ItemGroup>
+
+</Project>

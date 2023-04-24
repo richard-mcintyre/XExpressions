@@ -10,7 +10,7 @@ namespace XExpressions
     {
         #region Construction
 
-        public UnexpectedCharacterException(string expression, int position)
+        internal UnexpectedCharacterException(string expression, int position)
             : base($"Unexpected character: {expression[position]}")
         {
             this.Expression = expression;

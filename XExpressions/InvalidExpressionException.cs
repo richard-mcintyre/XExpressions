@@ -8,7 +8,7 @@ namespace XExpressions
 {
     public class InvalidExpressionException : Exception
     {
-        public InvalidExpressionException(string msg)
+        internal InvalidExpressionException(string msg)
             : base(msg)
         {
         }

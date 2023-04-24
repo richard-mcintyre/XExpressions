@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace XExpressions
 {
-    public class Lexer : ILexer
+    /// <summary>
+    /// Simple lexer that parses a string containing an expression into a set of tokens
+    /// </summary>
+    internal class Lexer : ILexer
     {
         #region TokenEnumerator
 
@@ -87,8 +91,14 @@ namespace XExpressions
         #region Construction
 
         public Lexer(string expression)
+            : this(expression, XExpressionsSettings.Default)
+        {
+        }
+
+        public Lexer(string expression, XExpressionsSettings settings)
         {
             _expression = expression;
+            _settings = settings;
         }
 
         #endregion
@@ -96,6 +106,7 @@ namespace XExpressions
         #region Fields
 
         private readonly string _expression;
+        private readonly XExpressionsSettings _settings;
 
         #endregion
 
@@ -180,7 +191,7 @@ namespace XExpressions
                                 int pos = position;
                                 string identifier = AcceptIdentifier(ref position);
 
-                                if (String.Equals(identifier, "min", StringComparison.InvariantCultureIgnoreCase))
+                                if (_settings.TryGetFunction(identifier, out _))
                                     return Token.Function(pos, identifier);
 
                                 return Token.Identifier(pos, identifier);

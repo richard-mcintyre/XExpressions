@@ -14,11 +14,15 @@ namespace XExpressions.Tests
         {
             _identifierValues.Add("ident1", new Variant(Ident1Value));
             _identifierValues.Add("ident2", new Variant(Ident2Value));
+
+            foreach (string name in _identifierValues.Keys)
+                _settings.AddIdentifier(name, GetIdentifierValue);
         }
 
         private static Dictionary<string, Variant> _identifierValues = new Dictionary<string, Variant>();
         private static decimal Ident1Value = 123m;
         private static decimal Ident2Value = 234.56m;
+        private static XExpressionsSettings _settings = new XExpressionsSettings();
 
         private static Variant? GetIdentifierValue(string name)
         {
@@ -40,6 +44,7 @@ namespace XExpressions.Tests
             new TestCaseData("min(20, 30) + 5").Returns(Math.Min(20, 30) + 5),
             new TestCaseData("min(min(20, 30/2), min(100, 101))").Returns(Math.Min(Math.Min(20, 30m / 2m), Math.Min(100, 101))),
             new TestCaseData("min(ident1, ident2)").Returns(Math.Min(Ident1Value, Ident2Value)),
+            new TestCaseData("max(20, 30)").Returns(Math.Max(20, 30)),
             new TestCaseData("ident1").Returns(Ident1Value),
             new TestCaseData("ident1 * ident2").Returns(Ident1Value * Ident2Value),
         };
@@ -47,9 +52,9 @@ namespace XExpressions.Tests
         [Test, TestCaseSource(nameof(DecimalResultTestCases))]
         public decimal DecimalResultTests(string expression)
         {
-            Evaluator evaluator = new Evaluator(expression);
+            Evaluator evaluator = new Evaluator(expression, _settings);
 
-            Variant result = evaluator.Evaluate(GetIdentifierValue);
+            Variant result = evaluator.Evaluate();
 
             Assert.That(result.Kind, Is.EqualTo(VariantKind.Decimal));
 
@@ -65,13 +70,37 @@ namespace XExpressions.Tests
         [Test, TestCaseSource(nameof(BooleanResultTestCases))]
         public bool BooleanResultTests(string expression)
         {
-            Evaluator evaluator = new Evaluator(expression);
+            Evaluator evaluator = new Evaluator(expression, _settings);
 
-            Variant result = evaluator.Evaluate(GetIdentifierValue);
+            Variant result = evaluator.Evaluate();
 
             Assert.That(result.Kind, Is.EqualTo(VariantKind.Boolean));
 
             return (bool)result;
+        }
+
+        [Test]
+        public void CustomFunction()
+        {
+            string functionName = "test_func_name";
+
+            Variant[] expectedArgs = new Variant[] { 10, 20, 30 };
+            Variant expectedResult = 123;
+            Variant[]? actualArgs = null;
+
+            XExpressionsSettings settings = new XExpressionsSettings();
+            settings.AddFunction(functionName, 3, (name, args) =>
+            {
+                actualArgs = args;
+                return expectedResult;
+            });
+
+            Evaluator evaluator = new Evaluator($"{functionName}({(decimal)expectedArgs[0]}, {(decimal)expectedArgs[1]}, {(decimal)expectedArgs[2]})", settings);
+
+            Variant actualResult = evaluator.Evaluate();
+
+            Assert.That(actualResult, Is.EqualTo(expectedResult));
+            CollectionAssert.AreEqual(expectedArgs, actualArgs);
         }
     }
 }
