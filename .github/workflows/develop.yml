@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+    - name: Pull source
+      uses: actions/checkout@v3
+
     - name: Call other workflow
       uses: ./.github/workflows/build-and-test.yml
       with:
