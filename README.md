@@ -97,7 +97,7 @@ For the expression `1 + 2 * pi / 4 + min(10, 20)` the tree looks like:
 The repo contains an example application that allows you to enter an expression and get a result.  It also displays
 an image of the tree that was generated to evaluate the expression:
 
-![example app](docs/ExampleApp.gif)
+<img src="docs/ExampleApp.gif" width="460" height="437"/>
 
 The example application consists of a REST API to evaluate an expression and an angular app for the user to enter the expression.
 
