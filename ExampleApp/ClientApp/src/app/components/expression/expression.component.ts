@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { debounceTime, distinctUntilChanged, fromEvent, tap } from 'rxjs';
 import { EvaluateResponseModel } from 'src/app/models/EvaluateResponseModel';
 import { ApiService } from 'src/app/services/api.service';
+import { VariantKind } from 'src/app/models/VariantKind';
 
 @Component({
   selector: 'app-expression',
@@ -38,7 +39,7 @@ export class ExpressionComponent implements AfterViewInit {
         this.svgUrl = `/api/svg?expression=${encodeURIComponent(expr)}`;
       },
       err => {
-        this.evaluationResult = { value: '', log: '' };
+        this.evaluationResult = { value: '', kind: VariantKind.Unknown };
         this.errorDetails = err.error.title;
       } 
     );

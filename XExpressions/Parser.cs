@@ -11,12 +11,13 @@ namespace XExpressions
     /// <summary>
     /// Given an expression (from a lexer) builds a tree representing the expression
     /// </summary>
-    public class Parser
+    internal class Parser
     {
         #region Construction
 
         static Parser()
         {
+            // Build a dictionary of what tokens are allowed to follow a specific kind of token
             _expectedInitialTokens = new HashSet<TokenKind>();
             _expectedNextTokens = new Dictionary<TokenKind, HashSet<TokenKind>>();
 
@@ -82,8 +83,14 @@ namespace XExpressions
         }
 
         public Parser(ILexer lex)
+            : this(lex, XExpressionsSettings.Default)
+        {
+        }
+
+        public Parser(ILexer lex, XExpressionsSettings settings)
         {
             _lex = lex;
+            _settings = settings;
         }
 
         #endregion
@@ -91,6 +98,7 @@ namespace XExpressions
         #region Fields
 
         private readonly ILexer _lex;
+        private readonly XExpressionsSettings _settings;
         private readonly static HashSet<TokenKind> _expectedInitialTokens;
         private readonly static Dictionary<TokenKind, HashSet<TokenKind>> _expectedNextTokens;
 
@@ -301,17 +309,20 @@ namespace XExpressions
 
         private void HandleFunctionCall(Token funcToken, Stack<ExpressionNode> nodes)
         {
-            if (String.Equals(funcToken.Value, "min", StringComparison.InvariantCultureIgnoreCase))
+            if (_settings.TryGetFunction(funcToken.Value, out FunctionDef? funcDef))
             {
-                if (nodes.Count < 2)
+                if (nodes.Count < funcDef.ParameterCount)
                     throw new InvalidExpressionException("Invalid expression");
 
-                ExpressionNode node2 = nodes.Pop();
-                ExpressionNode node1 = nodes.Pop();
+                // Parameters are on the stack in reverse order, we need to put them into the right order
+                Stack<ExpressionNode> tmpStack = new Stack<ExpressionNode>();
+                for (int i = 0; i < funcDef.ParameterCount; i++)
+                    tmpStack.Push(nodes.Pop());
 
                 ExpressionNode funcNode = new ExpressionNode(funcToken);
-                funcNode.Children.Add(node1);
-                funcNode.Children.Add(node2);
+
+                while (tmpStack.Any())
+                    funcNode.Children.Add(tmpStack.Pop());
 
                 nodes.Push(funcNode);
             }

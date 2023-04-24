@@ -32,7 +32,7 @@ jobs:
       uses: vers-one/dotnet-project-version-updater@v1.3
       with:
         file: |
-          "**/XExpressions.csproj", "**/XExpressions.VariantType.csproj"
+          "**/XExpressions.csproj", "**/XExpressions.VariantType.csproj", "**/XExpressions.SVG.csproj"
         version: bump-build
 
     - name: Push version file changes
@@ -49,11 +49,14 @@ jobs:
     - name: Create package variant
       run: dotnet pack -o dist -c PackRelease XExpressions.VariantType
 
+    - name: Create package SVG
+      run: dotnet pack -o dist -c PackRelease XExpressions.SVG
+
     - name: Upload package artifacts
       uses: actions/upload-artifact@v3
       with:
         name: packages.zip
         path: dist
 
-#    - name: Push package to nuget
-#      run: dotnet nuget push "dist/*.nupkg" --api-key ${{secrets.NUGET_API_TOKEN}} --source https://api.nuget.org/v3/index.json
+    - name: Push package to nuget
+      run: dotnet nuget push "dist/*.nupkg" --api-key ${{secrets.NUGET_API_TOKEN}} --source https://api.nuget.org/v3/index.json

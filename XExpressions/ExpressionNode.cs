@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace XExpressions
 {
+    /// <summary>
+    /// Represents a node in a tree that represents an expression
+    /// </summary>
     public class ExpressionNode
     {
         #region Construction
 
-        public ExpressionNode(Token token)
+        internal ExpressionNode(Token token)
         {
             this.Token = token;
         }

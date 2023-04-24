@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XExpressions.VariantType", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XExpressions.VariantType.Tests", "XExpressions.VariantType.Tests\XExpressions.VariantType.Tests.csproj", "{BD865B11-0E93-4949-B444-F928100E2D76}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XExpressions.SVG", "XExpressions.SVG\XExpressions.SVG.csproj", "{C5E82BF8-3CFC-44B0-8AC2-CBCB540B206A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{BD865B11-0E93-4949-B444-F928100E2D76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD865B11-0E93-4949-B444-F928100E2D76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD865B11-0E93-4949-B444-F928100E2D76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5E82BF8-3CFC-44B0-8AC2-CBCB540B206A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5E82BF8-3CFC-44B0-8AC2-CBCB540B206A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5E82BF8-3CFC-44B0-8AC2-CBCB540B206A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5E82BF8-3CFC-44B0-8AC2-CBCB540B206A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

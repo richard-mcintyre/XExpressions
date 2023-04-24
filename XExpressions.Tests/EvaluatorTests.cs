@@ -161,16 +161,19 @@ namespace XExpressions.Tests
         {
             const string identName = "test_ident";
 
+            XExpressionsSettings settings = new XExpressionsSettings();
+            settings.AddIdentifier(identName, name =>
+            {
+                Assert.That(name, Is.EqualTo(identName));
+                return 9;
+            });
+
             Evaluator evaluator = new Evaluator(new LexerFake(
                 Token.Number(1),
                 Token.Add(),
-                Token.Identifier(identName)));
+                Token.Identifier(identName)), settings);
 
-            Variant result = evaluator.Evaluate(o =>
-            {
-                Assert.That(o, Is.EqualTo(identName));
-                return 9;
-            });
+            Variant result = evaluator.Evaluate();
 
             Assert.That(result.Kind, Is.EqualTo(VariantKind.Decimal));
 
@@ -202,12 +205,15 @@ namespace XExpressions.Tests
             const string identName = "ident1";
             const string testValue = "abc";
 
+            XExpressionsSettings settings = new XExpressionsSettings();
+            settings.AddIdentifier(identName, name => testValue);
+
             Evaluator evaluator = new Evaluator(new LexerFake(
                 Token.Identifier(identName),
                 Token.Equals(),
-                Token.String(testValue)));
+                Token.String(testValue)), settings);
 
-            Variant result = evaluator.Evaluate(o => testValue);
+            Variant result = evaluator.Evaluate();
 
             Assert.That(result.Kind, Is.EqualTo(VariantKind.Boolean));
 
@@ -263,24 +269,19 @@ namespace XExpressions.Tests
             string identName1 = "ident1";
             string identName2 = "ident2";
 
+            XExpressionsSettings settings = new XExpressionsSettings();
+            settings.AddIdentifier(identName1, name => 100);
+            settings.AddIdentifier(identName2, name => 200);
+
             Evaluator evaluator = new Evaluator(new LexerFake(
                 Token.Function("min"),
                 Token.OpenBracket(),
                 Token.Identifier(identName1),
                 Token.Comma(),
                 Token.Identifier(identName2),
-                Token.CloseBracket()));
+                Token.CloseBracket()), settings);
 
-            Variant result = evaluator.Evaluate(o =>
-            {
-                if (String.Equals(o, identName1, StringComparison.Ordinal))
-                    return 100;
-
-                if (String.Equals(o, identName2, StringComparison.Ordinal))
-                    return 200;
-
-                throw new Exception($"Unknown identifier: {o}");
-            });
+            Variant result = evaluator.Evaluate();
 
             Assert.That(result.Kind, Is.EqualTo(VariantKind.Decimal));
 

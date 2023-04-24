@@ -32,7 +32,7 @@ jobs:
       uses: vers-one/dotnet-project-version-updater@v1.3
       with:
         file: |
-          "**/XExpressions.csproj", "**/XExpressions.VariantType.csproj"
+          "**/XExpressions.csproj", "**/XExpressions.VariantType.csproj", "**/XExpressions.SVG.csproj"
         version: bump-revision
       
     - name: Create package
@@ -40,6 +40,9 @@ jobs:
 
     - name: Create package variant
       run: dotnet pack -o dist -c PackRelease XExpressions.VariantType
+
+    - name: Create package SVG
+      run: dotnet pack -o dist -c PackRelease XExpressions.SVG
 
     - name: Upload package artifacts
       uses: actions/upload-artifact@v3
