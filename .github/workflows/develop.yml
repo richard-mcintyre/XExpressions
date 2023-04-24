@@ -52,7 +52,7 @@ jobs:
       run: dotnet pack -o dist -c PackRelease XExpressions.VariantType
 
     - name: Upload package artifacts
-      uses: actions/@upload-artifact@v3
+      uses: actions/upload-artifact@v3
       with:
         name: packages
         path: dist
