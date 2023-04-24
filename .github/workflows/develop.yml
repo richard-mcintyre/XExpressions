@@ -51,6 +51,11 @@ jobs:
     - name: Create package variant
       run: dotnet pack -o dist -c PackRelease XExpressions.VariantType
 
+    - name: Upload package artifacts
+      uses: actions/@upload-artifact@v3
+      with:
+        name: packages
+        path: dist
 
 #    - name: Add publish source
 #      run: dotnet nuget add source --username richard-mcintyre --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/richard-mcintyre/index.json"
