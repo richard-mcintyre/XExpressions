@@ -21,8 +21,8 @@
 
 	<ItemGroup>
 		<None Include="..\README.md" Pack="true" PackagePath="\" Visible="false" />
-		<None Include="..\Docs\tree.png" Pack="true" PackagePath="\docs" Visible="false" />
-		<None Include="..\Docs\ExampleApp.gif" Pack="true" PackagePath="\docs" Visible="false" />
+		<None Include="..\docs\tree.png" Pack="true" PackagePath="\docs" Visible="false" />
+		<None Include="..\docs\ExampleApp.gif" Pack="true" PackagePath="\docs" Visible="false" />
 	</ItemGroup>
 
 </Project>
