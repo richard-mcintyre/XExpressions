@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using XExpressions.VariantType;
 
@@ -30,6 +32,12 @@ namespace XExpressions
 
             #region Fields
 
+            private static readonly TaskFactory _taskFactory = new TaskFactory(
+                CancellationToken.None,
+                TaskCreationOptions.None,
+                TaskContinuationOptions.None,
+                TaskScheduler.Default);
+
             private readonly XExpressionsSettings _settings;
 
             #endregion
@@ -44,6 +52,30 @@ namespace XExpressions
             /// <exception cref="Exception"></exception>
             public Variant Evaluate(ExpressionNode node)
             {
+                // Running an async method from a sync method is not ideal - however, this implementation is used by MS here
+                // https://github.com/aspnet/AspNetIdentity/blob/main/src/Microsoft.AspNet.Identity.Core/AsyncHelper.cs
+
+                CultureInfo cultureUI = CultureInfo.CurrentUICulture;
+                CultureInfo culture = CultureInfo.CurrentCulture;
+
+                return _taskFactory.StartNew(() =>
+                {
+                    Thread.CurrentThread.CurrentUICulture = cultureUI;
+                    Thread.CurrentThread.CurrentCulture = culture;
+
+                    return EvaluateAsync(node, CancellationToken.None).AsTask();
+                }).Unwrap().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Evaluates a tree node and its children
+            /// </summary>
+            /// <param name="node">Node to be evaluated</param>
+            /// <param name="cancellation"></param>
+            /// <returns></returns>
+            /// <exception cref="Exception"></exception>
+            public async ValueTask<Variant> EvaluateAsync(ExpressionNode node, CancellationToken cancellation)
+            {
                 switch (node.Token.Kind)
                 {
                     case TokenKind.Number:
@@ -56,94 +88,105 @@ namespace XExpressions
                         return Convert.ToBoolean(node.Token.Value);
 
                     case TokenKind.Identifier:
-                        return Handle_Identifier(node);
+                        return await Handle_IdentifierAsync(node, cancellation);
 
                     case TokenKind.AddOperator:
-                        return Handle_Add(node);
+                        return await Handle_AddAsync(node, cancellation);
 
                     case TokenKind.SubtractOperator:
-                        return Handle_Subtract(node);
+                        return await Handle_SubtractAsync(node, cancellation);
 
                     case TokenKind.MultiplyOperator:
-                        return Handle_Multiply(node);
+                        return await Handle_MultiplyAsync(node, cancellation);
 
                     case TokenKind.DivideOperator:
-                        return Handle_Divide(node);
+                        return await Handle_DivideAsync(node, cancellation);
 
                     case TokenKind.Equals:
-                        return Handle_Equals(node);
+                        return await Handle_EqualsAsync(node, cancellation);
 
                     case TokenKind.Function:
-                        return Handle_Function(node);
+                        return await Handle_FunctionAsync(node, cancellation);
                 }
 
                 throw new Exception($"Unknown token: {node.Token.Kind}");
             }
 
-            private Variant Handle_Add(ExpressionNode node)
+            private async ValueTask<Variant> Handle_AddAsync(ExpressionNode node, CancellationToken cancellation)
             {
-                Variant left = Evaluate(node.Children[0]);
-                Variant right = Evaluate(node.Children[1]);
+                Variant left = await EvaluateAsync(node.Children[0], cancellation);
+                Variant right = await EvaluateAsync(node.Children[1], cancellation);
 
                 return left + right;
             }
 
-            private Variant Handle_Subtract(ExpressionNode node)
+            private async ValueTask<Variant> Handle_SubtractAsync(ExpressionNode node, CancellationToken cancellation)
             {
-                Variant left = Evaluate(node.Children[0]);
-                Variant right = Evaluate(node.Children[1]);
+                Variant left = await EvaluateAsync(node.Children[0], cancellation);
+                Variant right = await EvaluateAsync(node.Children[1], cancellation);
 
                 return left - right;
             }
 
-            private Variant Handle_Multiply(ExpressionNode node)
+            private async ValueTask<Variant> Handle_MultiplyAsync(ExpressionNode node, CancellationToken cancellation)
             {
-                Variant left = Evaluate(node.Children[0]);
-                Variant right = Evaluate(node.Children[1]);
+                Variant left = await EvaluateAsync(node.Children[0], cancellation);
+                Variant right = await EvaluateAsync(node.Children[1], cancellation);
 
                 return left * right;
             }
 
-            private Variant Handle_Divide(ExpressionNode node)
+            private async ValueTask<Variant> Handle_DivideAsync(ExpressionNode node, CancellationToken cancellation)
             {
-                Variant left = Evaluate(node.Children[0]);
-                Variant right = Evaluate(node.Children[1]);
+                Variant left = await EvaluateAsync(node.Children[0], cancellation);
+                Variant right = await EvaluateAsync(node.Children[1], cancellation);
 
                 return left / right;
             }
 
-            private Variant Handle_Equals(ExpressionNode node)
+            private async ValueTask<Variant> Handle_EqualsAsync(ExpressionNode node, CancellationToken cancellation)
             {
-                Variant left = Evaluate(node.Children[0]);
-                Variant right = Evaluate(node.Children[1]);
+                Variant left = await EvaluateAsync(node.Children[0], cancellation);
+                Variant right = await EvaluateAsync(node.Children[1], cancellation);
 
                 return left == right;
             }
 
-            private Variant Handle_Identifier(ExpressionNode node)
+            private async ValueTask<Variant> Handle_IdentifierAsync(ExpressionNode node, CancellationToken cancellation)
             {
                 if (_settings.TryGetIdentifier(node.Token.Value, out IdentifierDef? identifier))
                 {
-                    Variant? identValue = identifier.fnGetValue.Invoke(node.Token.Value);
-                    if (identValue == null)
-                        throw new InvalidExpressionException($"Unknown identifier {node.Token.Value}");
+                    Variant? identValue;
 
-                    return identValue.Value;
+                    if (identifier.IsAsync)
+                    {
+                        identValue = await identifier.GetValueAsync(cancellation);
+                    }
+                    else
+                    {
+                        identValue = identifier.GetValue();
+                    }
+
+                    if (identValue != null)
+                        return identValue.Value;
                 }
-                else
-                    throw new InvalidExpressionException($"Unknown identifier {node.Token.Value}");
+
+                throw new InvalidExpressionException($"Unknown identifier {node.Token.Value}");
             }
 
-            private Variant Handle_Function(ExpressionNode node)
+            private async ValueTask<Variant> Handle_FunctionAsync(ExpressionNode node, CancellationToken cancellation)
             {
                 if (_settings.TryGetFunction(node.Token.Value, out FunctionDef? function))
                 {
                     Variant[] parameters = new Variant[function.ParameterCount];
 
                     for (int i = 0; i < parameters.Length; i++)
-                        parameters[i] = Evaluate(node.Children[i]);
+                        parameters[i] = await EvaluateAsync(node.Children[i], cancellation);
 
-                    return function.fnFuncImplementation(function.Name, parameters);
+                    if (function.IsAsync)
+                        return await function.InvokeAsync(parameters, cancellation);
+
+                    return function.Invoke(parameters);
                 }
 
                 throw new InvalidExpressionException($"Unknown function {node.Token.Value}");
@@ -249,6 +292,19 @@ namespace XExpressions
 
             TreeEvaluator eval = new TreeEvaluator(_settings);
             return eval.Evaluate(rootNode);
+        }
+
+        /// <summary>
+        /// Evaluates the expression
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns>Result of the expression evaluation</returns>
+        public async ValueTask<Variant> EvaluateAsync(CancellationToken cancellation = default)
+        {
+            ExpressionNode rootNode = GetRootExpressionNode();
+
+            TreeEvaluator eval = new TreeEvaluator(_settings);
+            return await eval.EvaluateAsync(rootNode, cancellation);
         }
 
         private ExpressionNode GetRootExpressionNode()

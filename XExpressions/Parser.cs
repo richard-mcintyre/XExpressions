@@ -309,22 +309,27 @@ namespace XExpressions
 
         private void HandleFunctionCall(Token funcToken, Stack<ExpressionNode> nodes)
         {
-            if (_settings.TryGetFunction(funcToken.Value, out FunctionDef? funcDef))
+            ExpressionNode CreateFunctionNode(Token token, int parameterCount, Stack<ExpressionNode> stackNodes)
             {
-                if (nodes.Count < funcDef.ParameterCount)
+                if (stackNodes.Count < parameterCount)
                     throw new InvalidExpressionException("Invalid expression");
 
                 // Parameters are on the stack in reverse order, we need to put them into the right order
                 Stack<ExpressionNode> tmpStack = new Stack<ExpressionNode>();
-                for (int i = 0; i < funcDef.ParameterCount; i++)
-                    tmpStack.Push(nodes.Pop());
+                for (int i = 0; i < parameterCount; i++)
+                    tmpStack.Push(stackNodes.Pop());
 
-                ExpressionNode funcNode = new ExpressionNode(funcToken);
+                ExpressionNode funcNode = new ExpressionNode(token);
 
                 while (tmpStack.Any())
                     funcNode.Children.Add(tmpStack.Pop());
 
-                nodes.Push(funcNode);
+                return funcNode;
+            }
+
+            if (_settings.TryGetFunction(funcToken.Value, out FunctionDef? funcDef))
+            {
+                nodes.Push(CreateFunctionNode(funcToken, funcDef.ParameterCount, nodes));
             }
             else
                 throw new InvalidExpressionException($"Unknown function: {funcToken}");

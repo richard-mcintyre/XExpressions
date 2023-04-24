@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework.Constraints;
+using System.Xml.Linq;
 using XExpressions.VariantType;
 
 namespace XExpressions.Tests
@@ -101,6 +102,105 @@ namespace XExpressions.Tests
 
             Assert.That(actualResult, Is.EqualTo(expectedResult));
             CollectionAssert.AreEqual(expectedArgs, actualArgs);
+        }
+
+        [Test]
+        public async Task AsyncIdentifierUsingEvaluateAsync()
+        {
+            string identName = "test_indent";
+
+            XExpressionsSettings settings = new XExpressionsSettings();
+            settings.AddIdentifier(identName, async (name, cancellation) =>
+            {
+                await Task.Delay(1);
+                return 123;
+            });
+
+            Evaluator evaluator = new Evaluator($"{identName} = 123", settings);
+
+            Variant actualResult = await evaluator.EvaluateAsync();
+
+            Assert.That(actualResult.Kind, Is.EqualTo(VariantKind.Boolean));
+            Assert.IsTrue(actualResult.Boolean);
+        }
+
+        [Test]
+        public void AsyncIdentifierUsingEvaluate()
+        {
+            string identName = "test_indent";
+
+            XExpressionsSettings settings = new XExpressionsSettings();
+            settings.AddIdentifier(identName, async (name, cancellation) =>
+            {
+                await Task.Delay(1);
+                return 123;
+            });
+
+            Evaluator evaluator = new Evaluator($"{identName} = 123", settings);
+
+            Variant actualResult = evaluator.Evaluate();
+
+            Assert.That(actualResult.Kind, Is.EqualTo(VariantKind.Boolean));
+            Assert.IsTrue(actualResult.Boolean);
+        }
+
+        [Test]
+        public async Task AsyncFunctionUsingEvaluatAsync()
+        {
+            string funcName = "test_func_name";
+
+            XExpressionsSettings settings = new XExpressionsSettings();
+            settings.AddFunction(funcName, 2, async (name, args, cancellation) =>
+            {
+                await Task.Delay(1);
+                return args[0] + args[1];
+            });
+
+            Evaluator evaluator = new Evaluator($"{funcName}(100, 200)", settings);
+
+            Variant actualResult = await evaluator.EvaluateAsync();
+
+            Assert.That(actualResult.Kind, Is.EqualTo(VariantKind.Decimal));
+            Assert.That(actualResult.Decimal, Is.EqualTo(300m));
+        }
+
+        [Test]
+        public void AsyncFunctionUsingEvaluatSync()
+        {
+            string funcName = "test_func_name";
+
+            XExpressionsSettings settings = new XExpressionsSettings();
+            settings.AddFunction(funcName, 2, async (name, args, cancellation) =>
+            {
+                await Task.Delay(1);
+                return args[0] + args[1];
+            });
+
+            Evaluator evaluator = new Evaluator($"{funcName}(100, 200)", settings);
+
+            Variant actualResult = evaluator.Evaluate();
+
+            Assert.That(actualResult.Kind, Is.EqualTo(VariantKind.Decimal));
+            Assert.That(actualResult.Decimal, Is.EqualTo(300m));
+        }
+
+        [Test]
+        public async Task ___()
+        {
+            XExpressionsSettings settings = new XExpressionsSettings();
+
+            // Add a function that calls a REST API
+            settings.AddFunction(name: "MyFunc", parameterCount: 0,
+                async(name, args, cancellation) =>
+                {
+                    // ... call a REST API and return a result ...
+                    await Task.Delay(1);
+                    return 123m;
+                });
+
+            // Evaluate the expression
+            Evaluator eval = new Evaluator("myfunc()", settings);
+            Variant result = await eval.EvaluateAsync();
         }
     }
 }

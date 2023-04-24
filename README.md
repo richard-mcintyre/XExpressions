@@ -13,6 +13,7 @@ Variant result = eval.Evaluate();
 | Standard Functions | A set of standard functions can be made available such as min, max etc...|
 | Custom Functions | Add your own functions to the expression language.<br /><br />You provide the name of the function and a delegate to invoke when it used.<br /><br />For example,  you can create a function called `myfunc` and use it in an expression such as `myfunc(10, 20, 30) * 40` |
 | Custom Variables/Constants | Add your own variables or constants to the expression language.<br /><br />You provide the name of the variable/constant and a delegate to retrieve the value when its used.<br /><br />For example, you create a variable called `amount` and use it in an expression such as `amount * 0.175` |
+| Asynchronous (Task) Support | Delegates for custom functions/variables/constants can be async.
 | Expression Tree | The expression text is broken down into a tree that can be examined or converted to an [SVG](https://en.wikipedia.org/wiki/SVG) to view an image of how the expression is evaluated. |
 | NuGet package | Available as a nuget package https://www.nuget.org/packages/XExpressions |
 
@@ -45,7 +46,7 @@ To add your own functions use `XExpressionsSettings` to specify the name of the 
 XExpressionsSettings settings = new XExpressionsSettings();
 
 // Add a function called MyFunc that takes two parameters and adds them
-settings.AddFunction(Name: "MyFunc", ParameterCount: 2, 
+settings.AddFunction(name: "MyFunc", parameterCount: 2, 
 	(name, args) => args[0] + args[1]);
 
 // Evaluate an expression using the function
@@ -62,14 +63,40 @@ To add your own constants or variables use `XExpressionsSettings` to specify the
 XExpressionsSettings settings = new XExpressionsSettings();
 
 // Add a constant call pi
-settings.AddIdentifier(Name: "pi", (name) => 3.14);
+settings.AddIdentifier(name: "pi", (name) => 3.14);
 
 // Add a variable called radius
-settings.AddIdentifier(Name: "radius", (name) => 5);
+settings.AddIdentifier(name: "radius", (name) => 5);
 
 // Evaluate an expression using the constant/variable
 Evaluator eval = new Evaluator("2 * pi * radius", settings);
 Variant result = eval.Evaluate();
+```
+
+## Asynchronous (Task) Support
+Evaluation can be synchronous via the `Evaluator.Evaluate` method or asynchronous via the `Evaluator.EvaluateAsync` method.  For example:
+```csharp
+Evaluator eval = new Evaluator("1 + 2 * 3 / 4");
+
+Variant result = await eval.EvaluateAsync();
+```
+
+This is particularly useful when adding custom functions/variables/constants that are also async.
+For example, you might add a function that calls a REST API:
+
+```csharp
+XExpressionsSettings settings = new XExpressionsSettings();
+
+// Add a function that calls a REST API
+settings.AddFunction(name: "MyFunc", parameterCount: 0,
+	async(name, args, cancellation) =>
+	{
+		// ... call a REST API and return a result ...
+	});
+
+// Evaluate the expression
+Evaluator eval = new Evaluator("myfunc()");
+Variant result = await eval.EvaluateAsync();
 ```
 
 ## Expression Tree
