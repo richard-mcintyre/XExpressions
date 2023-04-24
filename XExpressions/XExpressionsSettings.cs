@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using XExpressions.VariantType;
 
@@ -59,6 +60,15 @@ namespace XExpressions
         public void AddFunction(string name, int parameterCount, Func<string, Variant[], Variant> fnFuncImplementation) =>
             _functions.Add(name, new FunctionDef(name, parameterCount, fnFuncImplementation));
 
+        /// <summary>
+        /// Adds a custom function to the expression language
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="parameterCount"></param>
+        /// <param name="fnFuncImplementationAsync"></param>
+        public void AddFunction(string name, int parameterCount, Func<string, Variant[], CancellationToken, ValueTask<Variant>> fnFuncImplementationAsync) =>
+            _functions.Add(name, new FunctionDef(name, parameterCount, fnFuncImplementationAsync));
+
         internal bool TryGetFunction(string name, [NotNullWhen(true)] out FunctionDef? function)
         {
             if (this.IncludeDefaultFunctions && _defaultFunctions.TryGetValue(name, out function))
@@ -74,6 +84,14 @@ namespace XExpressions
         /// <param name="fnGetValue"></param>
         public void AddIdentifier(string name, Func<string, Variant?> fnGetValue) =>
             _identifiers.Add(name, new IdentifierDef(name, fnGetValue));
+
+        /// <summary>
+        /// Adds an identifier (constant/variable) to the expression language
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="fnGetValueAsync"></param>
+        public void AddIdentifier(string name, Func<string, CancellationToken, ValueTask<Variant?>> fnGetValueAsync) =>
+            _identifiers.Add(name, new IdentifierDef(name, fnGetValueAsync));
 
         internal bool TryGetIdentifier(string name, [NotNullWhen(true)] out IdentifierDef? identifier) =>
             _identifiers.TryGetValue(name, out identifier);
