@@ -4,7 +4,7 @@
 name: Build and publish to nuget
 
 on:
-  pull_request:
+  push:
     branches: [ "main" ]
 
 jobs:
