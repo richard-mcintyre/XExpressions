@@ -1,12 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
-		<ImplicitUsings>disable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
-
-	<PropertyGroup>
+		<PackageId>XExpressions.VariantType</PackageId>
 		<Version>1.0.1.0</Version>
 	</PropertyGroup>
 
