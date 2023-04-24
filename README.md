@@ -90,7 +90,7 @@ The `CreateSvg` method requires adding the [XExpressions.SVG](https://www.nuget.
 
 For the expression `1 + 2 * pi / 4 + min(10, 20)` the tree looks like:
 
-![expression tree](docs/tree.png)
+<img src="docs/tree.png" width="431" height="288"/>
 
 ## Example Application
 
