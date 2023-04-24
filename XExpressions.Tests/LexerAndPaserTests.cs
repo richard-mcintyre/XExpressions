@@ -183,24 +183,5 @@ namespace XExpressions.Tests
             Assert.That(actualResult.Kind, Is.EqualTo(VariantKind.Decimal));
             Assert.That(actualResult.Decimal, Is.EqualTo(300m));
         }
-
-        [Test]
-        public async Task ___()
-        {
-            XExpressionsSettings settings = new XExpressionsSettings();
-
-            // Add a function that calls a REST API
-            settings.AddFunction(name: "MyFunc", parameterCount: 0,
-                async(name, args, cancellation) =>
-                {
-                    // ... call a REST API and return a result ...
-                    await Task.Delay(1);
-                    return 123m;
-                });
-
-            // Evaluate the expression
-            Evaluator eval = new Evaluator("myfunc()", settings);
-            Variant result = await eval.EvaluateAsync();
-        }
     }
 }
