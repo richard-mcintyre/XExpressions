@@ -11,7 +11,7 @@ Variant result = eval.Evaluate();
 | Feature | Description |
 |---|---|
 | Standard Functions | A set of standard functions can be made available such as min, max etc...|
-| Custom Functions | Add your own functions to the expression language.<br /><br />You provide the name of the function and a delegate to invoke when it used.<br /><br />For example,  you can create a function called `myfunc` and use it in an expression such as `myfunc(10, 20, 30) * 40` |
+| Custom Functions | Add your own functions to the expression language.<br /><br />You provide the name of the function and a delegate to invoke when its used.<br /><br />For example,  you can create a function called `myfunc` and use it in an expression such as `myfunc(10, 20, 30) * 40` |
 | Custom Variables/Constants | Add your own variables or constants to the expression language.<br /><br />You provide the name of the variable/constant and a delegate to retrieve the value when its used.<br /><br />For example, you create a variable called `amount` and use it in an expression such as `amount * 0.175` |
 | Asynchronous (Task) Support | Delegates for custom functions/variables/constants can be async.
 | Expression Tree | The expression text is broken down into a tree that can be examined or converted to an [SVG](https://en.wikipedia.org/wiki/SVG) to view an image of how the expression is evaluated. |
